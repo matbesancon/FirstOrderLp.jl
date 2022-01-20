@@ -782,6 +782,8 @@ A SaddlePointOutput struct containing the solution found.
 function optimize(
   params::PdhgParameters,
   original_problem::QuadraticProgrammingProblem,
+  warm_start = 0,
+
 )
   validate(original_problem)
   qp_cache = cached_quadratic_program_info(original_problem)
