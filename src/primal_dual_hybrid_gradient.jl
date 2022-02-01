@@ -924,6 +924,7 @@ function optimize(
         solver_state.step_size,
         solver_state.primal_weight,
         POINT_TYPE_AVERAGE_ITERATE,
+        params.termination_criteria.optimality_norm,
       )
       method_specific_stats = current_iteration_stats.method_specific_stats
       method_specific_stats["time_spent_doing_basic_algorithm"] =

@@ -86,7 +86,7 @@ function solve_instance_and_output(
        endswith(lower_file_name, ".mps.gz") ||
        endswith(lower_file_name, ".qps") ||
        endswith(lower_file_name, ".qps.gz")
-      lp = FirstOrderLp.qps_reader_to_standard_form(
+      lp, names, types = FirstOrderLp.qps_reader_to_standard_form(
         instance_path,
         fixed_format = fixed_format_input,
       )

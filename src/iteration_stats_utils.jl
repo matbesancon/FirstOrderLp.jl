@@ -232,6 +232,7 @@ function compute_convergence_information(
   dual_iterate::Vector{Float64},
   eps_ratio::Float64,
   candidate_type::PointType,
+  optimality_norm::OptimalityNorm,
 )
   num_constraints, num_vars = size(problem.constraint_matrix)
   @assert length(primal_iterate) == num_vars
@@ -241,29 +242,39 @@ function compute_convergence_information(
 
   primal_residual = compute_primal_residual(problem, primal_iterate)
   convergence_info.primal_objective = primal_obj(problem, primal_iterate)
-  convergence_info.l_inf_primal_residual = norm(primal_residual, Inf)
-  convergence_info.l2_primal_residual = norm(primal_residual, 2)
-  convergence_info.relative_l_inf_primal_residual =
-    convergence_info.l_inf_primal_residual /
-    (eps_ratio + qp_cache.l_inf_norm_primal_right_hand_side)
-  convergence_info.relative_l2_primal_residual =
-    convergence_info.l2_primal_residual /
-    (eps_ratio + qp_cache.l2_norm_primal_right_hand_side)
-  convergence_info.l_inf_primal_variable = norm(primal_iterate, Inf)
-  convergence_info.l2_primal_variable = norm(primal_iterate, 2)
-
   dual_stats = compute_dual_stats(problem, primal_iterate, dual_iterate)
   convergence_info.dual_objective = dual_stats.dual_objective
-  convergence_info.l_inf_dual_residual = norm(dual_stats.dual_residual, Inf)
-  convergence_info.l2_dual_residual = norm(dual_stats.dual_residual, 2)
-  convergence_info.relative_l_inf_dual_residual =
-    convergence_info.l_inf_dual_residual /
-    (eps_ratio + qp_cache.l_inf_norm_primal_linear_objective)
-  convergence_info.relative_l2_dual_residual =
-    convergence_info.l2_dual_residual /
-    (eps_ratio + qp_cache.l2_norm_primal_linear_objective)
-  convergence_info.l_inf_dual_variable = norm(dual_iterate, Inf)
-  convergence_info.l2_dual_variable = norm(dual_iterate, 2)
+
+  if optimality_norm == L_INF
+    convergence_info.l_inf_primal_residual = norm(primal_residual, Inf)
+    convergence_info.relative_l_inf_primal_residual =
+      convergence_info.l_inf_primal_residual /
+      (eps_ratio + qp_cache.l_inf_norm_primal_right_hand_side)
+    convergence_info.l_inf_primal_variable = norm(primal_iterate, Inf)
+
+    convergence_info.l_inf_dual_residual = norm(dual_stats.dual_residual, Inf)
+    convergence_info.relative_l_inf_dual_residual =
+      convergence_info.l_inf_dual_residual /
+      (eps_ratio + qp_cache.l_inf_norm_primal_linear_objective)
+    convergence_info.l_inf_dual_variable = norm(dual_iterate, Inf)
+
+  elseif optimality_norm == L2
+    convergence_info.l2_primal_residual = norm(primal_residual, 2)
+    convergence_info.relative_l2_primal_residual =
+      convergence_info.l2_primal_residual /
+      (eps_ratio + qp_cache.l2_norm_primal_right_hand_side)
+    convergence_info.l2_primal_variable = norm(primal_iterate, 2)
+    
+    convergence_info.l2_dual_residual = norm(dual_stats.dual_residual, 2)
+    convergence_info.relative_l2_dual_residual =
+      convergence_info.l2_dual_residual /
+      (eps_ratio + qp_cache.l2_norm_primal_linear_objective)
+    convergence_info.l2_dual_variable = norm(dual_iterate, 2)
+
+
+  else
+    error("Unknown optimality_norm")
+  end
 
   convergence_info.corrected_dual_objective =
     corrected_dual_obj(problem, dual_stats)
@@ -368,6 +379,7 @@ function compute_iteration_stats(
   step_size::Float64,
   primal_weight::Float64,
   candidate_type::PointType,
+  optimality_norm::OptimalityNorm,
 )
   num_constraints, num_vars = size(problem.constraint_matrix)
   @assert length(primal_iterate) == num_vars
@@ -388,6 +400,7 @@ function compute_iteration_stats(
       dual_iterate,
       eps_optimal_absolute / eps_optimal_relative,
       candidate_type,
+      optimality_norm,
     ),
   ]
   stats.infeasibility_information = [
@@ -425,6 +438,7 @@ function evaluate_unscaled_iteration_stats(
   step_size::Float64,
   primal_weight::Float64,
   candidate_type::PointType,
+  optimality_norm::OptimalityNorm,
 )
   # Unscale iterates.
   original_primal_solution::Vector{Float64} =
@@ -447,6 +461,7 @@ function evaluate_unscaled_iteration_stats(
     step_size,
     primal_weight,
     candidate_type,
+    optimality_norm,
   )
 end
 

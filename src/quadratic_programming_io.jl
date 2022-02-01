@@ -193,5 +193,6 @@ function qps_reader_to_standard_form(
       mps.c,
       objective_matrix,
     ),
-  )
+  ),mps.varnames,
+  mps.vartypes
 end
