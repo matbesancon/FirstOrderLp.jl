@@ -990,7 +990,7 @@ function optimize(
           termination_reason,
           iteration - 1,
           iteration_stats,
-        )
+        ), solver_state
       end
 
       current_iteration_stats.restart_used = run_restart_scheme(
