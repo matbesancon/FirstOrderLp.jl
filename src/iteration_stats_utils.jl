@@ -172,7 +172,7 @@ function compute_dual_stats(
   if !isempty(inequality_range(problem))
     dual_residual = max.(-dual_solution[inequality_range(problem)], 0.0)
   else
-    dual_residual = []
+    dual_residual = Float64[]
   end
   reduced_cost_violations = primal_gradient .- reduced_costs
   dual_residual = [dual_residual; reduced_cost_violations]
