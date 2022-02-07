@@ -782,6 +782,7 @@ A SaddlePointOutput struct containing the solution found.
 function optimize(
   params::PdhgParameters,
   original_problem::QuadraticProgrammingProblem,
+  callback = do_nothing,
 )
   validate(original_problem)
   qp_cache = cached_quadratic_program_info(original_problem)
@@ -882,6 +883,11 @@ function optimize(
   solver_state.numerical_error = false
   display_iteration_stats_heading(params.verbosity)
 
+  # arrays we use to detect when early termination is possible
+  fixed_values = []
+  fixed_indices = []
+  solution_log = []
+
   iteration = 0
   while true
     iteration += 1
@@ -952,6 +958,13 @@ function optimize(
       )
       if solver_state.numerical_error && termination_reason == false
         termination_reason = TERMINATION_REASON_NUMERICAL_ERROR
+      end
+
+      # track primal solutions
+      termination = callback(solution_log, fixed_indices, fixed_values, solver_state.current_primal_solution, problem.variable_lower_bound, problem.variable_upper_bound)
+
+      if termination
+        termination_reason = TERMINATION_REASON_NO_IMPROVEMENT
       end
 
       # If we're terminating, record the iteration stats to provide final
@@ -1048,3 +1061,18 @@ function optimize(
       time() - time_spent_doing_basic_algorithm_checkpoint
   end
 end
+
+# function that simply returns 'false' so that we don't force optimize() to terminate early
+function do_nothing(
+    solution_log,
+    lb_indices,
+    ub_indices,
+    primal_sol::Vector{Float64},
+    lower_bound::Vector{Float64},
+    upper_bound::Vector{Float64},
+)
+    return false
+end
+
+  
+
