@@ -95,6 +95,12 @@ mutable struct TerminationCriteria
   cumulative_kkt_matrix_passes is at least kkt_pass_limit.
   """
   kkt_matrix_pass_limit::Float64
+
+  """
+  If the same set of variables have been fixed to its bounds for the past 
+  max_iter_no_improvement iterations, the algorithm is terminated
+  """
+  max_iter_no_improvement::Float64
 end
 
 function construct_termination_criteria(;
@@ -106,6 +112,7 @@ function construct_termination_criteria(;
   time_sec_limit = Inf,
   iteration_limit = typemax(Int32),
   kkt_matrix_pass_limit = Inf,
+  max_iter_no_improvement = Inf,
 )
   return TerminationCriteria(
     optimality_norm,
@@ -116,6 +123,7 @@ function construct_termination_criteria(;
     time_sec_limit,
     iteration_limit,
     kkt_matrix_pass_limit,
+    max_iter_no_improvement,
   )
 end
 

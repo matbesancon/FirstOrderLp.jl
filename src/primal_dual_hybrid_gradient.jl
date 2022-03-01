@@ -171,6 +171,18 @@ struct PdhgParameters
   record_iteration_stats::Bool
 
   """
+  Should an adaptive strategy be used for setting the (relative/absolut)
+  optimality tolerance.
+  """
+  adaptive_optimality_tol::Bool
+
+  """
+  Factor by which the optimality tolerance should decrease if an
+  adaptive strategy is used.
+  """
+  adaptive_optimality_tol_frac::Float64
+
+  """
   Check for termination with this frequency (in iterations).
   """
   termination_evaluation_frequency::Int32
@@ -961,7 +973,7 @@ function optimize(
       end
 
       # track primal solutions
-      termination = callback(solution_log, fixed_indices, fixed_values, solver_state.current_primal_solution, problem.variable_lower_bound, problem.variable_upper_bound)
+      termination = callback(solution_log, fixed_indices, fixed_values, solver_state.current_primal_solution, problem.variable_lower_bound, problem.variable_upper_bound, termination_criteria.max_iter_no_improvement)
 
       if termination
         termination_reason = TERMINATION_REASON_NO_IMPROVEMENT
@@ -1070,6 +1082,7 @@ function do_nothing(
     primal_sol::Vector{Float64},
     lower_bound::Vector{Float64},
     upper_bound::Vector{Float64},
+    max_iterations::Float64,
 )
     return false
 end
