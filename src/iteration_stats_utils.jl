@@ -259,7 +259,7 @@ function compute_convergence_information(
     convergence_info.l_inf_dual_variable = norm(dual_iterate, Inf)
 
   elseif optimality_norm == L2
-    convergence_info.l2_primal_residual = norm(primal_residual, 2)
+    convergence_info.l2_primal_residual = sqrt(dot(primal_residual, primal_residual))
     convergence_info.relative_l2_primal_residual =
       convergence_info.l2_primal_residual /
       (eps_ratio + qp_cache.l2_norm_primal_right_hand_side)
