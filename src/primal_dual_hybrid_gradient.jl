@@ -186,7 +186,7 @@ struct PdhgParameters
   If we should look at variables fixed to bounds (b) or integers (i) to check
   if can terminate early
   """
-  early_termination_type::String
+  early_termination_type::Bool
 
   """
   Check for termination with this frequency (in iterations).
@@ -980,7 +980,7 @@ function optimize(
       end
 
       # track primal solutions
-      if params.early_termination_type == "b"
+      if params.early_termination_type
          termination = callback(solution_log, fixed_indices, fixed_values, solver_state.current_primal_solution,
                                 problem.variable_lower_bound, problem.variable_upper_bound, int_indices, termination_criteria.max_iter_no_improvement)
       else
