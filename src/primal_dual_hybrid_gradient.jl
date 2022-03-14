@@ -982,10 +982,10 @@ function optimize(
       # track primal solutions
       if params.early_termination_type
          termination = callback(solution_log, fixed_indices, fixed_values, solver_state.current_primal_solution,
-                                problem.variable_lower_bound, problem.variable_upper_bound, int_indices, termination_criteria.max_iter_no_improvement)
+                                problem.variable_lower_bound, problem.variable_upper_bound, int_indices, termination_criteria.max_iter_no_improvement, termination_criteria.max_range_no_improvement)
       else
          termination = callback(solution_log, fixed_indices, fixed_values, solver_state.current_primal_solution,
-                                int_indices, termination_criteria.max_iter_no_improvement)
+                                int_indices, termination_criteria.max_iter_no_improvement, termination_criteria.max_range_no_improvement)
       end
 
       if termination

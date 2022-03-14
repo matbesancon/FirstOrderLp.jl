@@ -101,6 +101,10 @@ mutable struct TerminationCriteria
   max_iter_no_improvement iterations, the algorithm is terminated
   """
   max_iter_no_improvement::Float64
+  
+  """
+  """
+  max_range_no_improvement::Float64
 end
 
 function construct_termination_criteria(;
@@ -113,6 +117,7 @@ function construct_termination_criteria(;
   iteration_limit = typemax(Int32),
   kkt_matrix_pass_limit = Inf,
   max_iter_no_improvement = Inf,
+  max_range_no_improvement = 0.1,
 )
   return TerminationCriteria(
     optimality_norm,
@@ -124,6 +129,7 @@ function construct_termination_criteria(;
     iteration_limit,
     kkt_matrix_pass_limit,
     max_iter_no_improvement,
+    max_range_no_improvement,
   )
 end
 
