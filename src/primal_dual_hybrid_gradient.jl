@@ -183,6 +183,12 @@ struct PdhgParameters
   adaptive_optimality_tol_frac::Float64
 
   """
+  If we should look at variables fixed to bounds (b) or integers (i) to check
+  if can terminate early
+  """
+  early_termination_type::String
+
+  """
   Check for termination with this frequency (in iterations).
   """
   termination_evaluation_frequency::Int32
@@ -795,6 +801,7 @@ function optimize(
   params::PdhgParameters,
   original_problem::QuadraticProgrammingProblem,
   callback = do_nothing,
+  int_indices = [],
 )
   validate(original_problem)
   qp_cache = cached_quadratic_program_info(original_problem)
@@ -973,7 +980,13 @@ function optimize(
       end
 
       # track primal solutions
-      termination = callback(solution_log, fixed_indices, fixed_values, solver_state.current_primal_solution, problem.variable_lower_bound, problem.variable_upper_bound, termination_criteria.max_iter_no_improvement)
+      if params.early_termination_type == "b"
+         termination = callback(solution_log, fixed_indices, fixed_values, solver_state.current_primal_solution,
+                                problem.variable_lower_bound, problem.variable_upper_bound, int_indices, termination_criteria.max_iter_no_improvement)
+      else
+         termination = callback(solution_log, fixed_indices, fixed_values, solver_state.current_primal_solution,
+                                int_indices, termination_criteria.max_iter_no_improvement)
+      end
 
       if termination
         termination_reason = TERMINATION_REASON_NO_IMPROVEMENT
